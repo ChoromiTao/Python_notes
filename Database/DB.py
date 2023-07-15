@@ -94,6 +94,6 @@ def create_tables(db_: ClassDB):
               name VARCHAR, comment VARCHAR)"""
     db_.execute(query)
 
-    query = """CREATE TABLE IF NOT EXISTS contacts (contact_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          book_id INTEGER, name VARCHAR, phone VARCHAR, comment VARCHAR)"""
+    query = """CREATE TABLE IF NOT EXISTS notes (note_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          book_id INTEGER, name VARCHAR, text VARCHAR, date TEXT)"""
     db_.execute(query)

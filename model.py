@@ -1,5 +1,5 @@
 from Database import ClassDB, create_tables
-from classes import Book, Contact
+from classes import Book, Note
 import json
 
 db = ClassDB()
@@ -37,17 +37,16 @@ def set_curr_book(id: int | None):
         curr_book = None
 
 
-def find_contacts(pattern) -> list[Contact]:
-    return [Contact(db, *item) for item in
-            db.get_data("contacts", ("book_id", "contact_id", "name", "phone", "comment"),
-                        {"name": '%' + pattern + '%', "phone": '%' + pattern + '%',
-                         "comment": '%' + pattern + '%'},
+def find_notes(pattern) -> list[Note]:
+    return [Note(db, *item) for item in
+            db.get_data("notes", ("book_id", "note_id", "name", "text"),
+                        {"name": '%' + pattern + '%', "text": '%' + pattern + '%'},
                         fetchall=True, like=True, or_and="OR")]
 
 
 def save_book_in_file(path):
     with open(path, "w", encoding="UTF-8") as file:
-        file.write(json.dumps(list(map(lambda x: x.get_dump(), get_curr_book().get_contact_list()))))
+        file.write(json.dumps(list(map(lambda x: x.get_dump(), get_curr_book().get_note_list()))))
 
 
 def load_book_from_file(path) -> bool:
@@ -55,7 +54,7 @@ def load_book_from_file(path) -> bool:
         get_curr_book().clear()
         try:
             for i in json.load(file):
-                get_curr_book().add_contact(i["name"], i["phone"], i["comment"])
+                get_curr_book().add_note(i["name"], i["text"])
         except:
             return False
 

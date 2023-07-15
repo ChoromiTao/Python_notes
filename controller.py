@@ -8,9 +8,9 @@ def start():
 
     while True:
         if model.get_curr_book():
-            view.print_message(tf.current_phone_book.replace("%name%", model.get_curr_book().name))
+            view.print_message(tf.current_book.replace("%name%", model.get_curr_book().name))
         else:
-            view.print_message(tf.no_phone_book)
+            view.print_message(tf.no_note_book)
 
         choice = view.main_menu()
         match choice:
@@ -27,7 +27,7 @@ def start():
                 view.show_books(list(map(str, model.get_books_list())))
                 name, comment = view.input_book()
                 model.create_book(name, comment)
-                view.print_message(tf.sucessfull_create_phone_book.replace("%name%", name))
+                view.print_message(tf.sucessfull_create_book.replace("%name%", name))
             case 3:
                 # изменить книгу
                 if model.get_curr_book():
@@ -40,50 +40,59 @@ def start():
                 if model.get_curr_book():
                     book = model.get_curr_book()
                     book.del_book()
-                    view.print_message(tf.sucessfull_delete_phone_book.replace("%name%", book.name))
+                    view.print_message(tf.sucessfull_delete_book.replace("%name%", book.name))
                     view.show_books(list(map(str, model.get_books_list())))
                     model.set_curr_book(None)
             case 5:
-                # просмотр контактов
+                # просмотр записок
                 if model.get_curr_book():
-                    view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
+                    date = view.input_date()
+                    view.show_book_notes(model.get_curr_book().get_note_list(date))
             case 6:
-                # найти контакт
-                view.show_contacts(
-                    [(str(contact), contact.book_id) for contact in model.find_contacts(view.input_pattern())],
-                    message=tf.no_find_contacts)
+                # открыть записку
+                if model.get_curr_book():
+                    view.show_book_notes(model.get_curr_book().get_note_list())
+                    id = view.select_note(model.get_curr_book().get_notes_ids())
+                    if id:
+                        note = model.get_curr_book().get_note(id)
+                        view.show_note(str(note))
             case 7:
-                # создать контакт
-                if model.get_curr_book():
-                    model.get_curr_book().add_contact(*view.input_contact())
-                    view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
+                # найти записку
+                view.show_notes_list(
+                    [(str(note), note.book_id) for note in model.find_notes(view.input_pattern())],
+                    message=tf.no_find_notes)
             case 8:
-                # изменить контакт
+                # создать записку
                 if model.get_curr_book():
-                    view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
-                    id = view.select_contact(model.get_curr_book().get_contacts_ids())
-                    if id:
-                        contact = model.get_curr_book().get_contact(id)
-                        contact.name, contact.phone, contact.comment = view.input_contact()
-                        contact.update_db()
-                        view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
+                    model.get_curr_book().add_note(*view.input_note())
+                    view.show_book_notes(model.get_curr_book().get_note_list())
             case 9:
-                # удалить контакт
+                # изменить записку
                 if model.get_curr_book():
-                    view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
-                    id = view.select_contact(model.get_curr_book().get_contacts_ids())
+                    view.show_book_notes(model.get_curr_book().get_note_list())
+                    id = view.select_note(model.get_curr_book().get_notes_ids())
                     if id:
-                        contact = model.get_curr_book().get_contact(id)
-                        model.get_curr_book().get_contact(id).del_contact()
-                        view.print_message(tf.sucessfull_delete_contact.replace("%name%", contact.name))
-                        view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
+                        note = model.get_curr_book().get_note(id)
+                        note.name, note.text, note.comment = view.input_note()
+                        note.update_db()
+                        view.show_book_notes(model.get_curr_book().get_note_list())
             case 10:
+                # удалить записку
+                if model.get_curr_book():
+                    view.show_book_notes(model.get_curr_book().get_note_list())
+                    id = view.select_note(model.get_curr_book().get_notes_ids())
+                    if id:
+                        note = model.get_curr_book().get_note(id)
+                        model.get_curr_book().get_note(id).delete()
+                        view.print_message(tf.sucessfull_delete_note.replace("%name%", note.name))
+                        view.show_book_notes(model.get_curr_book().get_note_list())
+            case 11:
                 # сохранить книгу в файл
                 if model.get_curr_book():
                     path = view.input_file()
                     if path:
                         model.save_book_in_file(path)
-            case 11:
+            case 12:
                 # загрузить книгу из файла
                 if model.get_curr_book():
                     path = view.input_file()

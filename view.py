@@ -14,25 +14,39 @@ def input_choice() -> int | None:
         elif num == "":
             return None
 
+def input_date() -> str | None:
+    while True:
+        date = input(tf.input_date)
+        if date == "":
+            return None
+        elif date.replace("-", "").isdigit():
+            return date
 
-def show_contacts(contacts: list[tuple], message: str):
-    if contacts:
+
+def show_notes_list(notes: list[tuple], message: str):
+    if notes:
         print("\n" + "=" * 83)
-        for contact in contacts:
-            print(contact[0], f"Книга: {contact[1]:<2}", sep=" | ")
+        for note in notes:
+            print(note[0])
 
         print("=" * 83 + "\n")
     else:
         print_message(message)
 
 
-def show_book_contacts(contacts: list):
+def show_note(note: str):
+    print("\n" + "=" * 83)
+    print(note)
+    print("=" * 83 + "\n")
+
+
+def show_book_notes(notes: list):
     print("\n" + "=" * 72)
-    if len(contacts) > 0:
-        for contact in contacts:
-            print(contact)
+    if len(notes) > 0:
+        for note in notes:
+            print(f"{str(note.id):<3} | {note.name:<20} | {note.date:<20}")
     else:
-        print(tf.no_contacts)
+        print(tf.no_notes)
     print("=" * 72 + "\n")
 
 
@@ -44,7 +58,7 @@ def print_message(message: str):
 
 def show_books(books: list):
     if len(books) == 0:
-        print_message(tf.no_phone_books)
+        print_message(tf.no_note_books)
     else:
         print("\n" + "=" * 72)
         for book in books:
@@ -70,23 +84,22 @@ def input_book():
     return name, comment
 
 
-def input_contact():
+def input_note():
     while True:
-        if len(name := input(tf.input_contact_name)) > 0:
+        if len(name := input(tf.input_note_name)) > 0:
             break
 
     while True:
-        if len(phone := input(tf.input_contact_phone).replace(" ", "")) > 0 and phone.isdigit():
+        if len(text := input(tf.input_note_text).replace(" ", "")) > 0:
             break
 
-    comment = input(tf.input_contact_comment)
-    return name, phone, comment
+    return name, text
 
 
-def select_contact(contacts_ids):
+def select_note(notes_ids):
     while True:
-        num = input(tf.select_contact)
-        if num.isdigit() and int(num) in contacts_ids:
+        num = input(tf.select_note)
+        if num.isdigit() and int(num) in notes_ids:
             return int(num)
         elif num == "":
             return None
